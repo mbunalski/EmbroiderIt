@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Ensure placeholder text is a darker gray */
+input::placeholder, select::placeholder {
+  color: #555; /* Darker gray for better visibility */
+}
+
+/* Ensure text inside input fields and dropdowns is a very dark gray */
+input, select {
+  color: #222; /* Real dark gray */
+}
+
+/* Optional: Improve input field styling */
+input, select {
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+  outline: none;
+  width: 100%;
+}
+
+/* Optional: Add focus effect for better UI */
+input:focus, select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
