@@ -15,16 +15,20 @@ export function MainForm () {
   const [downloadLink, setDownloadLink] = useState("");
 
   const handleSubmit = async () => {
-    const response = await fetch("https://cyw8e6y685.execute-api.us-east-1.amazonaws.com/default/embroiderit-generate", {
+    const response = await fetch("https://07kdlkmc4f.execute-api.us-east-1.amazonaws.com/test", {
       method: "POST",
-      headers: { "Content-Type": "application/json",
-      "Access-Control-Allow-Origin" : "*", // Required for CORS support to work
-      "Access-Control-Allow-Credentials" : true // Required for cookies, authorization headers with HTTPS},
+      headers: { "Content-Type": "application/json"
         },
       body: JSON.stringify({ username, characters, size, fontGroup }),
     });
-    const data = await response.json();
-    setDownloadLink(data.download_url);
+    const textData = await response.text(); // Read response as text
+    try {
+        const data = JSON.parse(textData);  // Convert stringified JSON to an object
+        const url = JSON.parse(data.body)
+        setDownloadLink(url.download_url);
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+      }
   };
 
   const handleCopyLink = () => {
