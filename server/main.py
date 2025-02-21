@@ -163,6 +163,53 @@ def convert_pdfs_to_pngs(input_folder, output_folder):
 
             print(f"Converted: {filename} -> {output_path}")
 
+from PIL import Image
+import os
+import numpy as np
+
+def trim_whitespace(input_folder, output_folder, buffer=50):
+    """
+    Trims excess white space from images in a folder while keeping a buffer.
+
+    :param input_folder: Path to the folder containing images.
+    :param output_folder: Path to save the trimmed images.
+    :param buffer: Extra pixels to keep as border.
+    """
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    for filename in os.listdir(input_folder):
+        if filename.lower().endswith((".png", ".jpg", ".jpeg")):
+            img_path = os.path.join(input_folder, filename)
+            img = Image.open(img_path).convert("RGBA")
+
+            # Convert image to numpy array
+            img_array = np.asarray(img)
+
+            # Find all non-white pixels (assuming white is (255,255,255,255))
+            non_white_pixels = np.where(img_array[:, :, :3] < 250)  # Ignore near-white pixels
+            if non_white_pixels[0].size == 0 or non_white_pixels[1].size == 0:
+                print(f"Skipping {filename}: No non-white content found.")
+                continue
+
+            # Get bounding box of non-white content
+            y_min, y_max = non_white_pixels[0].min(), non_white_pixels[0].max()
+            x_min, x_max = non_white_pixels[1].min(), non_white_pixels[1].max()
+
+            # Apply buffer (ensure it doesn't go out of bounds)
+            y_min = max(y_min - buffer, 0)
+            y_max = min(y_max + buffer, img.height)
+            x_min = max(x_min - buffer, 0)
+            x_max = min(x_max + buffer, img.width)
+
+            # Crop and save
+            cropped_img = img.crop((x_min, y_min, x_max, y_max))
+            output_path = os.path.join(output_folder, filename)
+            cropped_img.save(output_path)
+
+            print(f"Trimmed and saved: {output_path}")
+
+
 
 
 @app.route("/generate-collage", methods=["POST"])
@@ -179,6 +226,7 @@ def generate_collage():
 
 if __name__ == "__main__":
     # Example Usage
-    convert_pdfs_to_pngs("../source/old_floral", "../source/floral")
+    # convert_pdfs_to_pngs("../source/old_floral", "../source/floral")
+    trim_whitespace("../source/emblem", "../source/output")
     exit()
     app.run(debug=True)
